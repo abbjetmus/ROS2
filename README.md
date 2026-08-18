@@ -79,7 +79,7 @@ När det kommandot körts utan fel är du **klar för labb 1**.
 
 ## Inlämning
 
-Varje labb har en kort inlämning i slutet (svar på frågor, kodfil, eller skärmdump). Lämna in via kursens lärplattform.
+Varje labb har en kort inlämning i slutet (svar på frågor, kodfil, eller skärmdump). Skapa ett repo på länken och ladda upp varje labb i en egen markdown fil, tex lab1.md. [https://classroom-app.cloud.mustini.com/join/885f154c7cf1c7c5693b](https://classroom-app.cloud.mustini.com/join/885f154c7cf1c7c5693b)
 
 ## Förkunskaper
 
