@@ -90,53 +90,31 @@ ros2 topic bw /turtle1/pose
 
 Det första kommandot visar hur många meddelanden per sekund som skickas. Det andra visar bandbredden i bytes/sekund.
 
-## Uppgifter
+## Koppling till robotmoppen
 
-### Uppgift 1 — Topic-tabell
+Topics fungerar som robotmoppens interna signalkablar. Senare används bland annat:
 
-Fyll i tabellen för **alla** topics du hittade med `ros2 topic list -t`:
+```text
+/robotmopp/cmd_vel_raw
+/robotmopp/safety_stop
+/robotmopp/cmd_vel
+```
 
-| Topic | Message-typ | Vad tror du den används till? |
-|---|---|---|
-| ... | ... | ... |
+Varje topic har ett tydligt ansvar och en bestämd message-typ.
 
-### Uppgift 2 — Avläs position
+**Kopplingsfråga:** Vilket topic bör motorerna lyssna på — det råa kommandot eller det säkerhetskontrollerade kommandot? Förklara varför.
 
-Kör `ros2 topic echo /turtle1/pose` och styr sköldpaddan med teleop. Skriv ner sköldpaddans `x` och `y` när den är:
-
-- I startposition.
-- Längst upp till höger på skärmen.
-- Längst ner till vänster på skärmen.
-
-Vilket koordinatsystem använder turtlesim? Var ligger origo (`0,0`)?
-
-### Uppgift 3 — Tolka cmd_vel
-
-Lyssna på `/turtle1/cmd_vel` och tryck på varje piltangent i teleop ett kort ögonblick. Skriv ner vilka värden som ändras i meddelandet för:
-
-- Pil upp
-- Pil ner
-- Pil vänster
-- Pil höger
-
-### Uppgift 4 — Frekvensanalys
-
-Kör `ros2 topic hz /turtle1/pose`. Skriv ner frekvensen. Kör sedan samma kommando för `/turtle1/cmd_vel` **medan du håller en piltangent nedtryckt**. Vilken skillnad ser du, och varför?
-
-### Uppgift 5 — Identifiera kopplingen
-
-Använd `ros2 topic info /turtle1/cmd_vel`. Vilken nod är publisher? Vilken är subscriber? Rita en pil-skiss av dataflödet.
-
-### Uppgift 6 — Krockdetektor (utmaning)
-
-Använd `ros2 topic echo /turtle1/pose` och styr sköldpaddan rakt in i en vägg. Vad händer med `x`, `y` och `theta` när sköldpaddan krockar? Skriv en hypotes om hur turtlesim hanterar väggar.
+Svara med 1–2 meningar. Svaret ingår i inlämningen.
 
 ## Inlämning
 
 1. Ifylld tabell från uppgift 1.
 2. Svar och koordinater från uppgift 2.
-3. Tabell över piltangenter och cmd_vel-värden från uppgift 3.
-4. Svar på uppgift 4, 5 och 6.
+3. Tabell över piltangenter och `cmd_vel`-värden från uppgift 3.
+4. Svar på uppgift 4 och 5.
+5. Kort svar på kopplingsfrågan om robotmoppen.
+
+Uppgift 6 är frivillig fördjupning.
 
 ## Användbara kommandon
 

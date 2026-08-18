@@ -27,7 +27,7 @@ Efter labben ska du kunna:
 
 ## Del 0: Installera colcon
 
-`colcon` ingår inte i ROS2-installationen från labb 1. Installera det en gång:
+`colcon` ingår inte alltid i en minimal ROS2-installation. Installera det en gång:
 
 ```bash
 sudo apt update
@@ -47,7 +47,7 @@ Bygg det tomma workspacet:
 colcon build
 ```
 
-Efter byggningen finns tre nya mappar: `build/`, `install/` och `log/`. Lägg på minnet — efter varje bygge måste du köra:
+Efter byggningen finns tre nya mappar: `build/`, `install/` och `log/`. Efter varje bygge måste du köra:
 
 ```bash
 source install/setup.bash
@@ -61,13 +61,13 @@ source install/setup.bash
 cd ~/ros2_ws/src
 ros2 pkg create --build-type ament_python \
   --license Apache-2.0 \
-  --dependencies rclpy geometry_msgs turtlesim \
+  --dependencies rclpy geometry_msgs std_msgs turtlesim \
   min_turtle
 ```
 
 Detta skapar en mapp `min_turtle/` med:
 
-```
+```text
 min_turtle/
 ├── min_turtle/        ← här lägger du Python-filer
 │   └── __init__.py
@@ -80,7 +80,7 @@ min_turtle/
 
 ## Del 3: Skriv en trivial nod
 
-Öppna VS Code i workspacet om du inte redan gjort det:
+Öppna VS Code i workspacet:
 
 ```bash
 cd ~/ros2_ws
@@ -133,89 +133,36 @@ source install/setup.bash
 ros2 run min_turtle hej
 ```
 
-Du ska se:
+Du ska se ungefär:
 
-```
+```text
 [INFO] [hej_nod]: Hej från min första ROS2-nod!
 ```
 
-## Uppgifter
+## Koppling till robotmoppen
 
-### Uppgift 1 — Förstå mappstrukturen
+Robotmoppens mjukvara samlas senare i ett eget package. Där kan gruppen ha exempelvis:
 
-Kör `tree -L 3 ~/ros2_ws` (eller `ls -R` om `tree` inte finns). Skärmdump av utdata. Markera i bilden:
-
-- Var ligger källkoden?
-- Var ligger den **byggda** versionen som `ros2 run` använder?
-
-### Uppgift 2 — Ditt namn
-
-Ändra texten i `hej.py` så att den loggar `Hej, jag heter <ditt namn>!`. Bygg om och kör. Skärmdump av utdata.
-
-### Uppgift 3 — Vad händer utan `source`?
-
-Öppna en **ny terminal** och kör direkt:
-
-```bash
-ros2 run min_turtle hej
+```text
+robotmopp_system/
+├── controller_node.py
+├── sensor_node.py
+├── safety_node.py
+├── motor_node.py
+└── launch/
 ```
 
-Vad händer? Kör sedan `source ~/ros2_ws/install/setup.bash` och försök igen. Förklara skillnaden.
+Workspacet gör att alla delar kan byggas och startas på ett ordnat sätt.
 
-### Uppgift 4 — Lägg till en kommandoradsparameter
+**Kopplingsfråga:** Vad är skillnaden mellan workspacet och robotmoppens package?
 
-Ändra `hej.py` så att noden tar emot ett namn som **ROS2-parameter** och loggar `Hej, <namn>!`:
-
-```python
-class HejNod(Node):
-    def __init__(self):
-        super().__init__('hej_nod')
-        self.declare_parameter('namn', 'okänd')
-        namn = self.get_parameter('namn').value
-        self.get_logger().info(f'Hej, {namn}!')
-```
-
-Kör med:
-
-```bash
-ros2 run min_turtle hej --ros-args -p namn:=Sofia
-```
-
-Skärmdump där parametern syns i utdatat.
-
-### Uppgift 5 — Andra noden (utmaning)
-
-Skapa en ny fil `src/min_turtle/min_turtle/raknare.py` som loggar `Tick N` varje sekund (där N ökar från 1 och uppåt). Använd en `self.create_timer(1.0, self.tick)` i konstruktorn och låt `tick`-metoden öka en räknare.
-
-Tips:
-
-```python
-self.n = 0
-self.timer = self.create_timer(1.0, self.tick)
-
-def tick(self):
-    self.n += 1
-    self.get_logger().info(f'Tick {self.n}')
-```
-
-Kom ihåg att i `main` byta `spin_once` till `spin(node)` så att timern fortsätter köra.
-
-Registrera `raknare = min_turtle.raknare:main` i `setup.py`, bygg om, och kör med `ros2 run min_turtle raknare`.
+Svara med 1–2 meningar. Svaret ingår i inlämningen.
 
 ## Inlämning
 
 1. Skärmdumpar från uppgift 1, 2 och 4.
 2. Förklaring från uppgift 3.
-3. Filen `raknare.py` + skärmdump som visar minst fem tickar.
-4. En kort beskrivning (3–5 meningar) av skillnaden mellan workspace och package.
+3. En kort beskrivning av skillnaden mellan workspace och package.
+4. Kort svar på kopplingsfrågan om robotmoppen.
 
-## Användbara kommandon
-
-```bash
-ros2 pkg create --build-type ament_python --dependencies ... <namn>
-colcon build                              # bygg allt
-colcon build --packages-select <namn>     # bygg ett package
-source install/setup.bash                 # aktivera bygget
-ros2 run <pkg> <executable>               # kör en nod
-ros2 pkg list                             # alla installerade packages
-```
+Uppgift 5 är frivillig fördjupning.

@@ -1,25 +1,26 @@
 # Labb 5: Publisher-nod i Python
 
-**Skriv en egen nod som styr sköldpaddan**
+**Skriv en egen ROS2-nod som skickar styrkommandon**
 
 **Förkunskaper:** Labb 1–4
 
 ## Syfte
 
-I labb 3 skickade du `cmd_vel`-meddelanden manuellt från terminalen. Nu skriver du en Python-nod som gör samma sak automatiskt — en **publisher**. Det är samma princip som används för att styra riktiga robotar.
+I labb 3 skickade du `cmd_vel`-meddelanden manuellt från terminalen. Nu skriver du en Python-nod som gör samma sak automatiskt — en **publisher**.
+
+Fokus i den här labben är inte avancerad robotlogik. Fokus är att förstå hur en egen nod skapar och publicerar ROS2-meddelanden.
 
 ## Mål
 
 Efter labben ska du kunna:
 
 - Skapa en publisher med `create_publisher`.
-- Använda `create_timer` för att skicka meddelanden regelbundet.
-- Bygga ett `Twist`-meddelande i Python och publicera det.
-- Förändra publicerade värden i realtid baserat på tid eller logik.
+- Använda `create_timer` för att köra en funktion regelbundet.
+- Skapa ett `Twist`-meddelande i Python.
+- Publicera meddelandet på `/turtle1/cmd_vel`.
+- Ändra ett värde och förutse hur robotens rörelse påverkas.
 
-## Del 1: Repetera workspacet
-
-Om du tappat bort `min_turtle` från labb 4, skapa den igen enligt instruktionerna där. Aktivera workspacet:
+## Del 1: Aktivera workspacet
 
 ```bash
 cd ~/ros2_ws
@@ -32,9 +33,15 @@ Starta turtlesim i en separat terminal:
 ros2 run turtlesim turtlesim_node
 ```
 
-## Del 2: Skelett för publisher
+## Del 2: Skapa publisher-noden
 
-Skapa filen `src/min_turtle/min_turtle/cirkel.py`:
+Skapa filen:
+
+```text
+src/min_turtle/min_turtle/cirkel.py
+```
+
+Lägg in:
 
 ```python
 import rclpy
@@ -68,23 +75,27 @@ if __name__ == '__main__':
     main()
 ```
 
-Förklaring rad-för-rad:
+### Vad är viktigast i koden?
 
-| Rad | Vad den gör |
+| Kod | Vad den gör |
 |---|---|
-| `create_publisher(Twist, '/turtle1/cmd_vel', 10)` | Skapar en publisher på topicet, med kö-storlek 10. |
-| `create_timer(0.1, self.skicka_kommando)` | Anropa metoden var 0.1 sekund (10 Hz). |
-| `msg = Twist()` | Skapa ett tomt Twist-meddelande. |
-| `publisher.publish(msg)` | Skicka meddelandet. |
-| `rclpy.spin(node)` | Kör noden tills den stoppas med Ctrl+C. |
+| `create_publisher(...)` | Skapar en publisher på ett topic. |
+| `create_timer(0.1, ...)` | Kör funktionen var 0,1 sekund. |
+| `msg = Twist()` | Skapar ett nytt rörelsemeddelande. |
+| `msg.linear.x` | Hastighet framåt/bakåt. |
+| `msg.angular.z` | Rotation vänster/höger. |
+| `publish(msg)` | Skickar meddelandet. |
+| `rclpy.spin(node)` | Håller noden igång. |
 
-## Del 3: Registrera och bygg
+## Del 3: Registrera noden
 
-Lägg till i `setup.py` under `console_scripts`:
+Öppna `src/min_turtle/setup.py` och lägg till:
 
 ```python
 'cirkel = min_turtle.cirkel:main',
 ```
+
+under `console_scripts`.
 
 Bygg och kör:
 
@@ -95,107 +106,60 @@ source install/setup.bash
 ros2 run min_turtle cirkel
 ```
 
-Sköldpaddan ska börja köra i cirkel.
+Sköldpaddan ska börja köra i en cirkel.
 
-## Uppgifter
+## Del 4: Kontrollera att ROS2 ser din nod
 
-### Uppgift 1 — Stora och små cirklar
+Med cirkel-noden igång, öppna en annan terminal:
 
-Ändra `linear.x` och `angular.z` så att sköldpaddan ritar:
-
-- **a)** En cirkel med radie ungefär 1 enhet.
-- **b)** En cirkel med radie ungefär 3 enheter.
-- **c)** En motsatt riktad cirkel (medurs istället för moturs).
-
-Förklara med en mening hur radien beror på de två värdena.
-
-### Uppgift 2 — Spiral
-
-Modifiera noden så att sköldpaddan rör sig i en **spiral** som öppnar sig utåt. Tips: låt `linear.x` öka långsamt över tid medan `angular.z` är konstant.
-
-```python
-self.t = 0.0
-
-def skicka_kommando(self):
-    self.t += 0.1
-    msg = Twist()
-    msg.linear.x = ...     # öka med tiden
-    msg.angular.z = ...    # konstant
-    self.publisher.publish(msg)
+```bash
+ros2 node list
+ros2 node info /cirkel_nod
+ros2 topic echo /turtle1/cmd_vel
 ```
 
-Skärmdump av spiralen.
+Försök identifiera:
 
-### Uppgift 3 — Fyrkant
+- nodens namn,
+- vilket topic den publicerar på,
+- vilken message-typ som används.
 
-Skriv en ny nod `src/min_turtle/min_turtle/fyrkant.py` som får sköldpaddan att rita en fyrkant. Använd ett tillstånd som växlar mellan "kör rakt" och "sväng 90 grader".
+---
 
-Förslag på struktur:
+## Koppling till robotmoppen
 
-```python
-class FyrkantNod(Node):
-    def __init__(self):
-        super().__init__('fyrkant_nod')
-        self.publisher = self.create_publisher(Twist, '/turtle1/cmd_vel', 10)
-        self.timer = self.create_timer(0.1, self.tick)
-        self.steg = 0          # vilket "steg" vi är i
-        self.tid_i_steg = 0.0  # hur länge vi varit i steget
+Publisher-noden i den här labben motsvarar senare en styrnod som skickar önskad rörelse på:
 
-    def tick(self):
-        msg = Twist()
-        if self.steg % 2 == 0:
-            # Kör rakt i 2 sekunder
-            msg.linear.x = 1.0
-            if self.tid_i_steg > 2.0:
-                self.steg += 1
-                self.tid_i_steg = 0.0
-        else:
-            # Sväng 90° (cirka pi/2 radianer)
-            msg.angular.z = ...
-            if self.tid_i_steg > ...:
-                self.steg += 1
-                self.tid_i_steg = 0.0
-
-        self.publisher.publish(msg)
-        self.tid_i_steg += 0.1
+```text
+/robotmopp/cmd_vel_raw
 ```
 
-Fyll i värdena så att svängen blir 90°. Tips: om `angular.z = 1.0` rad/s, hur lång tid tar en kvarts vridning?
+Kommandot går först till säkerhetsnoden och därefter till motorerna. Styrningen ska alltså inte köra motorerna direkt.
 
-Skärmdump av fyrkanten.
+**Kopplingsfråga:** Vad kan hända om en controller publicerar direkt till motorn och kringgår säkerhetsnoden?
 
-### Uppgift 4 — Stjärna (utmaning)
-
-Bygg vidare på `fyrkant.py` och skapa `stjarna.py` som ritar en femuddig stjärna. Tips: vinkeln mellan strecken i en femuddig stjärna är 144°.
-
-### Uppgift 5 — Bokstaven i ditt namn (utmaning)
-
-Skriv en nod som ritar första bokstaven i ditt namn utan teleop. Du får använda services (t.ex. `teleport_absolute` och `set_pen`) tillsammans med din publisher.
-
-Tips för att anropa services från Python:
-
-```python
-from turtlesim.srv import TeleportAbsolute
-self.tp_client = self.create_client(TeleportAbsolute, '/turtle1/teleport_absolute')
-self.tp_client.wait_for_service()
-req = TeleportAbsolute.Request()
-req.x = 5.0
-req.y = 5.0
-req.theta = 0.0
-self.tp_client.call_async(req)
-```
+Svara med 1–2 meningar. Svaret ingår i inlämningen.
 
 ## Inlämning
 
-1. Värden från uppgift 1 + en mening om radien.
-2. `spiral.py` (eller modifierad `cirkel.py`) + skärmdump.
-3. `fyrkant.py` + skärmdump.
-4. Antingen `stjarna.py` eller bokstavsnoden + skärmdump.
+Lämna in:
+
+1. `cirkel.py`.
+2. Kort svar från uppgift 1.
+3. Värden + skärmdumpar från uppgift 2.
+4. Skärmdump och förklaring från uppgift 3.
+5. Dataflödet från uppgift 4.
+6. Kort svar på kopplingsfrågan om robotmoppen.
 
 ## Vanliga problem
 
-**Sköldpaddan rör sig inte fast noden körs** — kör turtlesim igång? Kollar du rätt topic-namn (`/turtle1/cmd_vel`, inte `/cmd_vel`)?
+**Sköldpaddan rör sig inte** — kontrollera att turtlesim körs och att topicet heter `/turtle1/cmd_vel`.
 
-**`ImportError: No module named 'min_turtle'`** — du körde inte `source install/setup.bash` i terminalen där du startar noden.
+**Ändringar syns inte** — bygg om och source:a igen:
 
-**Sköldpaddan flyger iväg när noden stoppas inte ordentligt** — om du startar samma nod två gånger får sköldpaddan dubbla kommandon. Avsluta gamla körningar med `Ctrl+C` först.
+```bash
+colcon build --packages-select min_turtle
+source install/setup.bash
+```
+
+**Två noder styr samtidigt** — stäng `turtle_teleop_key` när du testar din egen publisher.
