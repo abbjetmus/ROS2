@@ -83,18 +83,59 @@ Rensa skärmen:
 ros2 service call /clear std_srvs/srv/Empty "{}"
 ```
 
-## Koppling till robotmoppen
+## Uppgifter
 
-`geometry_msgs/msg/Twist` används inte bara i turtlesim. Samma typ av meddelande kan beskriva önskad rörelse för robotmoppen:
+### Uppgift 1 — Snabb och långsam
 
-- `linear.x` — framåt eller bakåt,
-- `angular.z` — vänster eller höger.
+Skicka `cmd_vel`-meddelanden med olika `linear.x`. Hitta:
 
-Den fysiska `motor_node` översätter sedan dessa två värden till signaler för vänster och höger motor.
+- En hastighet där sköldpaddan rör sig nästan omärkligt långsamt.
+- En hastighet där den åker tvärs över skärmen på under en sekund.
+- Vad händer om du sätter `linear.x` till ett **negativt** värde?
 
-**Kopplingsfråga:** Varför är det praktiskt att styrningen skickar ett allmänt `Twist`-meddelande i stället för att känna till exakt motormodell?
+### Uppgift 2 — Perfekt cirkel
 
-Svara med 1–2 meningar. Svaret ingår i inlämningen.
+Med rätt kombination av `linear.x` och `angular.z` kan du få sköldpaddan att rita en cirkel. Hitta värden så att den ritar:
+
+- En liten cirkel (radie ≈ 1 enhet).
+- En stor cirkel (radie ≈ 4 enheter).
+
+> **Tips:** Radien blir `linear.x / angular.z`.
+
+Skärmdump av båda cirklarna.
+
+### Uppgift 3 — Regnbåge
+
+Skriv en sekvens av kommandon (en lista i ditt dokument räcker) som:
+
+1. Rensar skärmen.
+2. Sätter pennan till röd.
+3. Kör framåt en bit.
+4. Sätter pennan till grön.
+5. Kör framåt en bit till.
+6. Sätter pennan till blå.
+7. Kör framåt en bit till.
+
+Kör sekvensen. Skärmdump.
+
+### Uppgift 4 — Tre sköldpaddor
+
+Spawna `turtle2` och `turtle3` på olika positioner. Kör `ros2 topic list`. Vilka nya topics finns? Försök publicera till `turtle2/cmd_vel` så att bara `turtle2` rör sig.
+
+### Uppgift 5 — Skriv ditt initial automatiskt (utmaning)
+
+Använd `teleport_absolute`, `set_pen` och `cmd_vel` för att rita första bokstaven i ditt namn **utan teleop**. Du får använda så många kommandon du vill. Spara sekvensen i en bash-fil och kör den med `bash mitt_namn.sh`.
+
+Exempel på struktur:
+
+```bash
+#!/bin/bash
+ros2 service call /turtle1/set_pen turtlesim/srv/SetPen "{off: 1}"
+ros2 service call /turtle1/teleport_absolute turtlesim/srv/TeleportAbsolute "{x: 2.0, y: 8.0, theta: 0.0}"
+ros2 service call /turtle1/set_pen turtlesim/srv/SetPen "{r: 0, g: 0, b: 255, width: 3, off: 0}"
+ros2 topic pub --once /turtle1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 5.0}}"
+# osv...
+```
 
 ## Inlämning
 
@@ -102,9 +143,7 @@ Svara med 1–2 meningar. Svaret ingår i inlämningen.
 2. Värden + skärmdumpar från uppgift 2.
 3. Sekvensen och skärmdumpen från uppgift 3.
 4. Svar från uppgift 4.
-5. Kort svar på kopplingsfrågan om robotmoppen.
-
-Uppgift 5 är frivillig fördjupning.
+5. Bash-filen och skärmdump från uppgift 5.
 
 ## Användbara kommandon
 

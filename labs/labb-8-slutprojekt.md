@@ -1,250 +1,143 @@
-# Labb 8: Från turtlesim till robotmoppen
+# Labb 8: Slutprojekt — autonom sköldpadda
 
-**Testa gränssnitten utan hårdvara och planera den fysiska integrationen**
+**Eget projekt — bygg din egen autonoma robot**
 
 **Förkunskaper:** Labb 1–7
 
 ## Syfte
 
-I labb 7 fungerade turtlesim som robot och `sim_safety_sensor` som sensor. Nu ska du visa att säkerhetsnoden fungerar även när simulatorn tas bort.
+I slutprojektet sätter du ihop allt du lärt dig och bygger en **egen** autonom sköldpadda. Du väljer själv vilket beteende din robot ska ha, så länge det uppfyller projektets minimikrav.
 
-Du ska inte skriva en ny avancerad algoritm. I stället ska du:
+## Lärandemål
 
-1. testa varje gränssnitt som en svart låda,
-2. bestämma vilka noder den fysiska robotmoppen behöver,
-3. dokumentera topics och ansvar,
-4. och skapa en tydlig integrationsplan för gruppen.
+Eleven ska visa att hen kan:
 
-Det här är övergången mellan **Smarta system** och **Teknik 2**.
+- Designa ett robotsystem med flera noder.
+- Implementera minst en publisher och minst en subscriber i eget Python-package.
+- Använda **services** och/eller **parametrar**.
+- Reflektera över robotens beteende och dess kopplingar till verkliga robotar.
 
-## Mål
+## Minimikrav
 
-Efter labben ska du kunna:
+Ditt projekt **måste** innehålla:
 
-- testa en ROS2-nod utan att all hårdvara finns,
-- använda terminalen för att simulera sensor, styrning och motor,
-- skriva ett enkelt systemkontrakt,
-- förklara vad som ska återanvändas och vad som ska bytas,
-- och planera en säker stegvis integration.
+1. **Eget package** byggt med `colcon` i `~/ros2_ws`.
+2. **Minst två noder** som kommunicerar via ett topic.
+3. **Minst en subscriber** som påverkar robotens beteende (sensorvärden ⇒ beslut).
+4. **Minst en service-anrop** (t.ex. `set_pen`, `teleport_absolute`, `spawn`).
+5. **En launch-fil** som startar hela systemet med ett kommando.
+6. **README.md** i ditt package som beskriver projektet (se mallen längst ned).
 
-## Arkitekturen på den fysiska robotmoppen
+## Projektförslag
 
-```text
-[controller_node]
-        │
-        │ /robotmopp/cmd_vel_raw
-        ▼
-   [safety_node] ◄──── /robotmopp/safety_stop ──── [sensor_node]
-        │
-        │ /robotmopp/cmd_vel
-        ▼
-    [motor_node]
-        │
-        ▼
-  motordrivare + motorer
+Välj ett av förslagen eller kom på något eget (godkänns av läraren).
+
+### Förslag A — Förföljaren
+
+Två sköldpaddor: `turtle1` rör sig längs en förutbestämd bana (t.ex. en cirkel). `turtle2` försöker hela tiden köra mot `turtle1`. Logga avståndet mellan dem var sekund.
+
+### Förslag B — Konstnären
+
+En nod som ritar en figur du själv designat — t.ex. ett mönster av cirklar, en stjärnhimmel, eller ditt namn skrivet med olika färger. Använd `set_pen` och `teleport_absolute` för att variera färg och hoppa mellan delar.
+
+### Förslag C — Smart städare
+
+Sköldpaddan ska "städa" arenan genom att besöka så stor area som möjligt på 60 sekunder. Använd vägg-undvikaren från labb 7 men förbättra den, t.ex. med slumpmässig vändning eller minne av besökta områden.
+
+### Förslag D — Hinderbana
+
+Spawna 3–5 sköldpaddor som står stilla och fungerar som hinder. En sjätte sköldpadda ska navigera från startpunkten till en målpunkt utan att komma närmare än 1.5 enheter från något hinder.
+
+### Förslag E — Trafikljus
+
+Två sköldpaddor som korsar varandras vägar. En `trafikljus`-nod publicerar `röd`/`grön` på ett eget topic. Sköldpaddorna stannar vid en linje när ljuset är rött.
+
+## Steg-för-steg
+
+### 1. Planering
+
+- Välj projektidé.
+- Beskriv den kortfattat i din repository på Github.
+
+### 2. Implementation
+
+- Skapa eller återanvänd ditt package från labb 4.
+- Implementera noderna en i taget och testa dem var för sig.
+- Använd `git` för att hålla ordning på din kod (rekommenderas).
+
+### 3. Launch-fil
+
+Skapa filen `src/min_turtle/launch/projekt.launch.py`:
+
+```python
+from launch import LaunchDescription
+from launch_ros.actions import Node
+
+
+def generate_launch_description():
+    return LaunchDescription([
+        Node(package='turtlesim', executable='turtlesim_node'),
+        Node(package='min_turtle', executable='min_nod'),
+        # ... fler noder
+    ])
 ```
 
-### Vad återanvänds?
+Lägg till i `setup.py`:
 
-`safety_node.py` från labb 7 ska kunna återanvändas.
+```python
+import os
+from glob import glob
+# ...
+data_files=[
+    ('share/ament_index/resource_index/packages', ['resource/min_turtle']),
+    ('share/' + package_name, ['package.xml']),
+    (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
+],
+```
 
-### Vad byts?
-
-- `sim_safety_sensor` ersätts av en nod som läser en riktig sensor.
-- turtlesim ersätts av en nod som skickar data till motordrivaren.
-- teleop kan först vara tangentbord och senare bytas mot joystick eller annan manuell styrning.
-
-## Del 1: Starta bara säkerhetsnoden
+Kör med:
 
 ```bash
-cd ~/ros2_ws
+colcon build --packages-select min_turtle
 source install/setup.bash
-ros2 run min_turtle safety_node
+ros2 launch min_turtle projekt.launch.py
 ```
 
-Öppna tre ytterligare terminaler.
+### 4. Inlämning
+Slutprojektet redovisas genom en inlämning av kod och visat resultatet för någon av lärarna. 
 
-### Terminal A — låtsas vara motorn
+## README-mall
 
-```bash
-ros2 topic echo /robotmopp/cmd_vel
+Skriv en `README.md` i ditt package med följande korta sektioner:
+
+### 1. Projektbeskrivning
+
+Vad gör din robot? Vilken idé valde du och varför?
+
+### 2. Systemarkitektur
+
+Rita ett diagram över dina noder och topics. Exempel:
+
+```
+/teleop_egen ──/turtle1/cmd_vel──► /turtlesim
+                                       │
+                                       ▼
+                              /turtle1/pose
+                                       │
+                                       ▼
+                              /min_styrare
 ```
 
-### Terminal B — låtsas vara sensorn
+### 3. Så kör man projektet
 
-Börja med fri väg:
+Vilka kommandon behövs för att bygga och starta systemet (t.ex. `colcon build` och `ros2 launch ...`).
 
-```bash
-ros2 topic pub --rate 2 /robotmopp/safety_stop \
-  std_msgs/msg/Bool "{data: false}"
-```
+### 4. Reflektion
 
-### Terminal C — låtsas vara styrningen
+- Vad var svårast?
+- Vad skulle behövas för att din kod skulle fungera på en riktig robot (t.ex. en städrobot)?
+- Vilka begränsningar har turtlesim jämfört med en verklig miljö?
 
-```bash
-ros2 topic pub --rate 2 /robotmopp/cmd_vel_raw \
-  geometry_msgs/msg/Twist \
-  "{linear: {x: 1.0}, angular: {z: 0.0}}"
-```
+## Lycka till!
 
-I Terminal A ska kommandot skickas vidare.
-
-Stoppa sensor-publishern med `Ctrl+C` och starta den med risk:
-
-```bash
-ros2 topic pub --rate 2 /robotmopp/safety_stop \
-  std_msgs/msg/Bool "{data: true}"
-```
-
-Nu ska framåthastigheten i Terminal A bli `0.0`.
-
-## Del 2: Genomför ett gränssnittstest
-
-Testa minst följande kombinationer:
-
-| Nr | `safety_stop` | `linear.x` | `angular.z` | Förväntat output |
-|---|---:|---:|---:|---|
-| 1 | `false` | `1.0` | `0.0` | framåt tillåts |
-| 2 | `true` | `1.0` | `0.0` | framåt blockeras |
-| 3 | `true` | `-1.0` | `0.0` | backning tillåts |
-| 4 | `true` | `0.0` | `1.0` | rotation tillåts |
-| 5 | ingen aktuell sensorsignal | `1.0` | `0.0` | framåt blockeras |
-
-För test 5 kan du antingen starta om `safety_node` utan sensor-publisher, eller stoppa sensor-publishern och vänta längre än parametern `sensor_timeout_sec` innan du skickar ett nytt framåtkommando.
-
-Det här är ett **black-box-test**: du testar vad noden gör utifrån input och output, utan att behöva ändra koden.
-
-## Del 3: Bestäm gruppens systemkontrakt
-
-Använd [robotmoppens systemkontrakt](../robotmopp/systemarkitektur.md) som gemensam standard.
-
-Fyll i en tabell för er grupp:
-
-| Nod | Input | Output | Vem ansvarar? | Testas hur? |
-|---|---|---|---|---|
-| `controller_node` | tangentbord/joystick | `/robotmopp/cmd_vel_raw` | ... | ... |
-| `sensor_node` | fysisk sensor | `/robotmopp/safety_stop` | ... | ... |
-| `safety_node` | rått kommando + säkerhet | `/robotmopp/cmd_vel` | ... | ... |
-| `motor_node` | `/robotmopp/cmd_vel` | motordrivare | ... | ... |
-
-Topicsens namn och message-typer ska vara samma för alla i gruppen. Då kan varje del utvecklas och testas separat.
-
-## Del 4: Rita två arkitekturer
-
-Rita:
-
-### A — Simulatorversionen
-
-```text
-teleop → safety_node → turtlesim
-            ▲
-            │
-   sim_safety_sensor
-```
-
-### B — Fysiska robotmoppen
-
-```text
-controller_node → safety_node → motor_node
-                       ▲
-                       │
-                  sensor_node
-```
-
-Markera tydligt:
-
-- vad som är oförändrat,
-- vad som byts,
-- vilka topics som binder ihop delarna.
-
-## Del 5: Planera integrationen stegvis
-
-Planera i följande ordning:
-
-1. **Mjukvarutest utan hårdvara** — terminalverktyg simulerar alla inputs och outputs.
-2. **Motorbänk** — hjulen lyfts från golvet och `motor_node` testas separat.
-3. **Manuell körning** — controller → safety → motor, utan moppmekanism.
-4. **Sensortest** — sensorn publicerar säkerhetssignal, motorn är fortfarande frånkopplad eller hjulen upplyfta.
-5. **Säkerhetsintegration** — verifiera att framåt stoppas men backning/rotation fungerar.
-6. **Moppmekanism** — konstruktionen monteras och testas separat.
-7. **Helhetstest** — roboten körs långsamt på avgränsad yta.
-
-Den ordningen minskar felsökning och gör att gruppen vet vilken del som orsakar ett fel.
-
-## Del 6: Koppling mellan kurserna
-
-### Teknik 2 ansvarar främst för
-
-- krav och konstruktion,
-- CAD och ritningar,
-- chassi, infästningar och tillverkning,
-- val och placering av komponenter,
-- moppmekanism,
-- mekaniska tester och förbättringar.
-
-### Smarta system ansvarar främst för
-
-- ROS2-package och launch,
-- noder och topics,
-- controller-, sensor-, safety- och motorgränssnitt,
-- systemtest och loggning,
-- felsökning av dataflödet.
-
-### Gemensamt ansvar
-
-- systemarkitektur,
-- säkerhet och riskanalys,
-- kabeldragning och komponentplacering,
-- integration,
-- testprotokoll,
-- slutdemonstration och reflektion.
-
----
-
-## GRUND — obligatoriskt
-
-### Uppgift 1 — Black-box-test
-
-Genomför de fem testerna i Del 2 och dokumentera faktiskt output.
-
-### Uppgift 2 — Systemkontrakt
-
-Fyll i nodtabellen med inputs, outputs, ansvarig och testmetod.
-
-### Uppgift 3 — Två arkitekturdiagram
-
-Rita simulatorversionen och den fysiska versionen. Markera vad som återanvänds.
-
-### Uppgift 4 — Integrationsplan
-
-Skriv gruppens ordning för minst fem teststeg. Varje steg ska ha ett tydligt godkänt-kriterium.
-
-### Uppgift 5 — Kort muntlig kontroll
-
-Varje elev ska kunna svara på:
-
-1. Varför får `motor_node` aldrig lyssna direkt på `/robotmopp/cmd_vel_raw`?
-2. Vilken nod kan testas utan att sensor och motor finns?
-3. Vad händer om sensorn slutar skicka data?
-4. Vilken del tillhör främst Teknik 2 och vilken tillhör främst Smarta system?
-
-## FÖRDJUPNING — frivilligt
-
-Gör bara detta efter att grundtesterna är godkända:
-
-- lägg till ett separat nödstopp,
-- publicera rått avstånd för övervakning,
-- lägg till maxhastighet som parameter,
-- eller skapa en enkel statuspanel i terminalen.
-
-Autonom väggundvikning och städmönster finns i [Fördjupning — autonom robotik](fordjupning-autonomi.md), men är inte en del av grundkraven.
-
-## Inlämning
-
-1. Ifyllt black-box-test.
-2. Gruppens systemkontrakt.
-3. Två arkitekturdiagram.
-4. Integrationsplan med godkänt-kriterier.
-5. Kort fördelning av ansvar mellan kurserna och gruppmedlemmarna.
-
-Efter godkänd labb fortsätter gruppen med [Robotmopp — elevprojekt](../robotmopp/README.md).
+Du har redan byggt: en publisher, en subscriber, en tillståndsmaskin, och du har använt services och parametrar. Slutprojektet handlar om att sätta ihop bitarna till något du själv har designat. Var ambitiös — men välj något du hinner bli klar med.

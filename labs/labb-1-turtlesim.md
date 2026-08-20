@@ -2,12 +2,12 @@
 
 **Introduktion till ROS2 med turtlesim, WSL och VS Code**
 
-**Nivå:** Nybörjare  
-**Miljö:** Windows 11, WSL2, Ubuntu 24.04, ROS2 Jazzy, VS Code
+**Nivå:** Nybörjare
+**Miljö:** Windows 11, WSL2, Ubuntu, ROS2, VS Code
 
 ## Syfte
 
-Du ska få din första praktiska kontakt med ROS2. Du startar en robotsimulator (turtlesim), styr en sköldpadda med tangentbordet och undersöker hur ett ROS2-system består av flera program som kommunicerar via meddelanden.
+Du ska få din första praktiska kontakt med ROS2. Du startar en robotsimulator (turtlesim), styr en sköldpadda med tangentbordet, och undersöker hur ett ROS2-system består av flera program som kommunicerar via meddelanden.
 
 ## Mål
 
@@ -22,13 +22,13 @@ Efter labben ska du kunna:
 
 **ROS2** (*Robot Operating System 2*) är inte ett operativsystem utan ett ramverk för robotprogramvara. Det hjälper utvecklare att bygga system där flera program — kallade **noder** — körs samtidigt och kommunicerar med varandra.
 
-Robotmoppens system kommer senare att följa samma idé:
+Ett verkligt robotsystem kan bestå av:
 
-```text
-/styrning ──► /sakerhet ──► /motorstyrning
-                  ▲
-                  │
-               /sensor
+```
+/kamera ──► /objektdetektion ──► /navigation ──► /motorstyrning
+                                       ▲
+                                       │
+                                    /lidar
 ```
 
 Varje ruta är en nod. I den här labben kör vi bara två noder:
@@ -38,24 +38,25 @@ Varje ruta är en nod. I den här labben kör vi bara två noder:
 | `/turtlesim` | Visar och simulerar sköldpaddan. |
 | `/teleop_turtle` | Läser piltangenterna och skickar styrkommandon. |
 
-ROS2 körs i vår Linuxmiljö i WSL2. **VS Code** öppnas från WSL-terminalen för att hamna i rätt miljö.
+ROS2 körs bäst i Linux, så vi använder **WSL2** med Ubuntu inuti Windows. **VS Code** öppnas från WSL-terminalen för att hamna i rätt miljö.
 
 ## Del 1: Kontrollera miljön
 
-Öppna **Ubuntu 24.04** från Start-menyn i Windows.
+Öppna **Ubuntu** från Start-menyn i Windows. Du bör nu se en terminal.
 
 ```bash
 pwd
-echo $ROS_DISTRO
-ros2 pkg list | grep turtlesim
+ros2 --version
 ```
 
-`pwd` ska visa något i stil med `/home/dittnamn` och `echo $ROS_DISTRO` ska visa `jazzy`.
-
-Om `echo $ROS_DISTRO` inte visar något, aktivera miljön:
+`pwd` ska visa något i stil med `/home/dittnamn`. Om `ros2 --version` ger felmeddelande behöver du aktivera miljön:
 
 ```bash
+# ROS2 Jazzy
 source /opt/ros/jazzy/setup.bash
+
+# eller ROS2 Humble
+source /opt/ros/humble/setup.bash
 ```
 
 ## Del 2: Öppna VS Code från WSL
@@ -72,7 +73,7 @@ Längst ner till vänster i VS Code ska det stå **`WSL: Ubuntu`**. Om det inte 
 
 ## Del 3: Starta turtlesim
 
-Öppna en terminal i VS Code och kör:
+Öppna en terminal (i VS Code: `Terminal → New Terminal`) och kör:
 
 ```bash
 ros2 run turtlesim turtlesim_node
@@ -82,7 +83,7 @@ Ett blått fönster med en sköldpadda ska öppnas.
 
 ## Del 4: Styr sköldpaddan
 
-Lämna turtlesim-fönstret öppet. Öppna en **ny terminal** och kör:
+Lämna turtlesim-fönstret öppet. Öppna en **ny terminal** (klicka på `+` i VS Code) och kör:
 
 ```bash
 ros2 run turtlesim turtle_teleop_key
@@ -98,9 +99,9 @@ Lämna båda programmen igång. Öppna en **tredje terminal**:
 ros2 node list
 ```
 
-Du ska se ungefär:
+Du ska se:
 
-```text
+```
 /teleop_turtle
 /turtlesim
 ```
@@ -114,36 +115,57 @@ ros2 node info /teleop_turtle
 
 Leta efter raderna under `Subscribers:`, `Publishers:` och `Services:`. Det är så du senare ser hur noder är kopplade.
 
-## Koppling till robotmoppen
+## Uppgifter
 
-På robotmoppen kommer systemet också delas upp i flera noder. En nod kan läsa styrningen, en annan kan läsa sensorn och en tredje kan styra motorerna.
+Lös följande uppgifter och dokumentera kort i din inlämning (1–2 meningar per uppgift, plus skärmdumpar där det är relevant).
 
-```text
-controller_node → safety_node → motor_node
-                        ▲
-                        │
-                   sensor_node
+### Uppgift 1 — Rita en fyrkant
+
+Använd piltangenterna och rita en så fyrkantig figur du kan. Ta en skärmdump av resultatet.
+
+### Uppgift 2 — Rita ditt initial
+
+Rita första bokstaven i ditt förnamn så tydligt du kan med sköldpaddan. Skärmdump.
+
+### Uppgift 3 — Räkna kopplingar
+
+Kör `ros2 node info /turtlesim`. Räkna hur många **subscribers** och hur många **publishers** noden har. Skriv ner siffrorna.
+
+### Uppgift 4 — Hitta den gemensamma kanalen
+
+Jämför utdatat från `ros2 node info /turtlesim` och `ros2 node info /teleop_turtle`. Vilket **topic** finns hos båda noderna? Vilken av noderna **publicerar** på det och vilken **subscriberar**?
+
+### Uppgift 5 — Experiment med att stänga noder
+
+1. Gå till terminalen där `turtle_teleop_key` körs och tryck `Ctrl+C`. Försök sedan styra sköldpaddan. Vad händer?
+2. Starta `turtle_teleop_key` igen. Försök sedan stänga `turtlesim_node` med `Ctrl+C`. Vad händer med fönstret? Vad händer om du kör `ros2 node list` nu?
+
+Förklara med egna ord vad du lärde dig av experimenten.
+
+### Uppgift 6 — Två sköldpaddor (utmaning)
+
+I en fjärde terminal, kör:
+
+```bash
+ros2 service call /spawn turtlesim/srv/Spawn "{x: 2.0, y: 2.0, theta: 0.0, name: 'turtle2'}"
 ```
 
-**Kopplingsfråga:** Varför är det bättre att dela upp robotmoppen i flera noder än att lägga all funktion i ett enda stort program?
-
-Svara med 1–2 meningar. Svaret ingår i inlämningen.
+Kör `ros2 node list` igen och `ros2 topic list`. Vad är nytt? Kan du styra `turtle2` med samma `turtle_teleop_key`? Varför / varför inte?
 
 ## Inlämning
 
-Lämna in:
+Lämna in ett dokument med:
 
 1. Skärmdumpar från uppgift 1 och 2.
-2. Svar på uppgift 3, 4 och 5.
-3. Tre meningar där du beskriver vad en **node** är, vad ett **topic** är och varför ROS2 delar upp ett system i flera program.
-4. Kort svar på kopplingsfrågan om robotmoppen.
+2. Svar på uppgift 3, 4, 5 och 6.
+3. Tre meningar där du beskriver vad en **node** är, vad ett **topic** är, och varför ROS2 delar upp ett system i flera program.
 
 ## Felsökning
 
-**`ros2: command not found`** — kör `source /opt/ros/jazzy/setup.bash`.
+**`ros2: command not found`** — Aktivera miljön: `source /opt/ros/jazzy/setup.bash` (eller `humble`).
 
-**Sköldpaddan rör sig inte** — kontrollera att `turtle_teleop_key`-terminalen är aktiv och att du använder piltangenterna.
+**Sköldpaddan rör sig inte** — Är `turtle_teleop_key`-terminalen aktiv (klickad i)? Använder du piltangenterna och inte WASD?
 
-**Turtlesim-fönstret öppnas inte** — kör `wsl --shutdown` i PowerShell och starta Ubuntu igen.
+**Turtlesim-fönstret öppnas inte** — Stäng WSL från PowerShell med `wsl --shutdown` och starta Ubuntu igen.
 
-**VS Code visar inte `WSL: Ubuntu`** — stäng VS Code och kör `cd ~/ros2_ws && code .` från Ubuntu-terminalen.
+**VS Code visar inte `WSL: Ubuntu`** — Stäng VS Code, gå tillbaka till Ubuntu-terminalen och kör `cd ~/ros2_ws && code .`.
