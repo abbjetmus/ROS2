@@ -42,11 +42,21 @@ Följ videon: **[Koppla till GitHub (video 2)](https://www.youtube.com/watch?v=7
 Följ instruktionerna i den officiella guiden för **ROS2 Humble** (Ubuntu 22.04):
 [docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html)
 
+Eller
+
+Följ instruktionerna i den officiella guiden för **ROS2 Jazzy** (Ubuntu 24.04):
+[docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html)
+
 Följ guiden ända **fram till och med**:
 
 ```bash
 source /opt/ros/humble/setup.bash
 ```
+
+```bash
+source /opt/ros/jazzy/setup.bash
+```
+
 
 När det kommandot körts utan fel är du **klar för labb 1**.
 
