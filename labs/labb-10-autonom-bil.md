@@ -171,7 +171,7 @@ Det som i turtlesim är pennspåret och arenan bygger du nu på golvet.
 | **Arena** | 2 × 2 m papper på golvet (byggpapp på rulle eller hopptejpade ark). Kartongväggar runt om, minst 15 cm höga så att ultraljudet ser dem. |
 | **Rutnät** | Rita ett rutnät med 25 cm rutor = 8 × 8 = **64 rutor**. |
 | **Penna** | Whiteboard- eller tuschpenna tejpad under bilens mitt, spetsen mot golvet med lite fjädring (en bit skumgummi räcker). |
-| **Start** | Bilen står i ett hörn, riktad in mot arenan. |
+| **Start** | Var som helst i arenan, valfri riktning. |
 
 **Mätprotokoll** (samma varje gång, annars går resultaten inte att jämföra):
 
@@ -245,9 +245,7 @@ ros2 launch min_turtle bil.launch.py
 
 **e) Täck det oritade (ljussensor).** Med ljussensorn från labb 9 uppgift 5 (`/ljus`) riktad mot golvet: lågt värde = mörkt = bilen kör över ett pennspår, alltså yta den redan täckt. Lägg till ett tillstånd `SVANG_BORT` som svänger tills sensorn ser oritat papper igen, och gå sedan tillbaka till `KOR_FRAMAT`. Kalibrera tröskeln med värdena du skrev upp i labb 9. Jämför täckning per minut med slumpen — det här är beteendet som direkt gör moppen bättre.
 
-**f) Hitta hem (ljussensor).** Ställ en stark lampa på golvet vid startrutan. När tiden är slut ska bilen köra hem mot ljuset: kör en kort bit, jämför `/ljus` med förra värdet, fortsätt rakt om det ökar, annars sväng. Fortsätt tills värdet är över en "hemma"-tröskel. (En klassisk Braitenberg-robot.)
-
-**g) Fjärrstyrning + autonomi.** Skriv en `vaktmastare`-nod som lyssnar på **både** `/cmd_vel_teleop` (från teleop, byt topic med `--ros-args -r cmd_vel:=cmd_vel_teleop`) och `/ultraljud`, och som släpper igenom teleop-kommandon till `/cmd_vel` **utom** framåt-kommandon när det är hinder inom `STOPP_AVSTAND`. En förare som inte kan köra in i väggen.
+**f) Fjärrstyrning + autonomi.** Skriv en `vaktmastare`-nod som lyssnar på **både** `/cmd_vel_teleop` (från teleop, byt topic med `--ros-args -r cmd_vel:=cmd_vel_teleop`) och `/ultraljud`, och som släpper igenom teleop-kommandon till `/cmd_vel` **utom** framåt-kommandon när det är hinder inom `STOPP_AVSTAND`. En förare som inte kan köra in i väggen.
 
 ## Inlämning
 
