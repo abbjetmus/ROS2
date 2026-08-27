@@ -46,7 +46,9 @@ Efter labben ska du kunna:
 | `<namn>/cmd` | dator → bil | `"<hastighet>,<vinkel>"` där hastighet är −1023…1023 (PWM, negativt = bakåt) och vinkel är −40…40 grader | `"600,-30"` |
 | `<namn>/distance` | bil → dator | avstånd i cm som decimaltal | `"37.2"` |
 
-`<namn>` är ditt eget prefix, samma som du använde i Driverbot-projektet (t.ex. `24lucsil`). Alla i klassen delar samma broker, så prefixet är det som skiljer din bil från de andras.
+`<namn>` är ditt eget prefix, samma som du använde i Driverbot-projektet. Alla i klassen delar samma broker, så prefixet är det som skiljer din bil från de andras.
+
+> **Vilken broker?** Labben är skriven för skolans broker `mqtt-broker.cloud.mustini.com` (ingen inloggning). Använder din klass **Maqiatto** (`maqiatto.com`) gäller: användarnamn = din e-post, och `<namn>` **måste** vara din e-post (t.ex. `fornamn.efternamn@hitachigymnasiet.se`), eftersom Maqiatto bara tillåter topics som börjar med den. Ange inloggning i firmware (`MQTT_USER`/`MQTT_PASS`) och i bryggan (`-p anvandare:=... -p losenord:=...`).
 
 ### Två saker som inte fanns i turtlesim
 
@@ -69,6 +71,7 @@ Skapa en ny sketch `ros_bil.ino`:
 #define WIFI_SSID     "Hitachigymnasiet_2.4"
 #define WIFI_PASSWORD "..."
 #define MQTT_NAMN     "24lucsil"   // ditt prefix — samma i ROS2-bryggan
+#define MQTT_BROKER   "mqtt-broker.cloud.mustini.com"   // eller "maqiatto.com"
 #define MQTT_USER     ""           // samma som i din gamla firmware ("" om inget)
 #define MQTT_PASS     ""
 
@@ -87,7 +90,7 @@ const unsigned long MATNING_MS = 100;   // hur ofta avståndet skickas
 
 EspMQTTClient client(
   WIFI_SSID, WIFI_PASSWORD,
-  "mqtt-broker.cloud.mustini.com",
+  MQTT_BROKER,
   MQTT_USER, MQTT_PASS,
   MQTT_NAMN "-bil",                     // klientnamn, måste vara unikt på brokern
   1883
@@ -200,6 +203,8 @@ Lyssna på sensorn i en terminal (byt `24lucsil` mot ditt prefix; lägg till `-u
 mosquitto_sub -h mqtt-broker.cloud.mustini.com -t 24lucsil/distance
 ```
 
+(Maqiatto: `mosquitto_sub -h maqiatto.com -u <epost> -P <lösenord> -t "<epost>/distance"`.)
+
 Du ska se avstånd rulla in ~10 ggr/s. Håll handen framför sensorn och se värdet ändras.
 
 Skicka ett kommando i en annan terminal — **ställ bilen på en låda så att hjulen snurrar fritt**:
@@ -237,7 +242,6 @@ from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Range
 import paho.mqtt.client as mqtt
 
-BROKER = 'mqtt-broker.cloud.mustini.com'
 MAX_PWM = 1023      # linear.x = 1.0  ->  full fart
 MAX_VINKEL = 40     # angular.z = 1.0 ->  fullt servoutslag
 
@@ -248,9 +252,11 @@ class BilBrygga(Node):
 
         # Parametrar (jämför labb 4, uppgift 4)
         self.declare_parameter('namn', 'andra_mig')
+        self.declare_parameter('broker', 'mqtt-broker.cloud.mustini.com')
         self.declare_parameter('anvandare', '')
         self.declare_parameter('losenord', '')
         namn = self.get_parameter('namn').value
+        broker = self.get_parameter('broker').value
         self.cmd_topic = f'{namn}/cmd'
         self.dist_topic = f'{namn}/distance'
 
@@ -265,7 +271,7 @@ class BilBrygga(Node):
             self.mqtt.username_pw_set(anvandare, self.get_parameter('losenord').value)
         self.mqtt.on_connect = self.mqtt_ansluten
         self.mqtt.on_message = self.fran_bilen
-        self.mqtt.connect(BROKER, 1883)
+        self.mqtt.connect(broker, 1883)
         self.mqtt.loop_start()      # MQTT kör i egen tråd, ROS2 spinner i huvudtråden
 
         self.get_logger().info(
@@ -342,7 +348,7 @@ source install/setup.bash
 ros2 run min_turtle bil_brygga --ros-args -p namn:=24lucsil
 ```
 
-(Lägg till `-p anvandare:=... -p losenord:=...` om din firmware loggar in på brokern.)
+(Lägg till `-p anvandare:=... -p losenord:=...` om din firmware loggar in på brokern, och `-p broker:=maqiatto.com` om ni använder Maqiatto.)
 
 ## Del 4: Kör bilen från ROS2
 
