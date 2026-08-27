@@ -1,6 +1,6 @@
 # ROS2 med turtlesim — labbserie
 
-Labbar för modulen *Robotik och ROS2* på Hitachigymnasiet. Eleverna bygger upp kunskap om ROS2 stegvis med hjälp av turtlesim, från att starta simulatorn till att skriva egna autonoma noder.
+Labbar för modulen *Robotik och ROS2* på Hitachigymnasiet. Eleverna bygger upp kunskap om ROS2 stegvis med hjälp av turtlesim, från att starta simulatorn till att skriva egna autonoma noder — och flyttar sedan över samma noder till sin riktiga robotbil från Driverbot-projektet (ESP8266).
 
 **Lärare:** Ahmad Alali, Jeton Mustini, Sofie Ahlberg
 
@@ -14,6 +14,8 @@ Labbar för modulen *Robotik och ROS2* på Hitachigymnasiet. Eleverna bygger upp
 | Editor | Visual Studio Code med WSL-extension |
 | Simulator | turtlesim |
 | Språk | Python (rclpy) |
+| Hårdvara (labb 9–10) | Elevens robotbil från Driverbot: ESP8266, TT-motor, servo, HC-SR04. Arduino IDE för firmware. |
+| Brygga bil ↔ ROS2 (labb 9–10) | MQTT via `mqtt-broker.cloud.mustini.com`, `paho-mqtt` i Python |
 
 All ROS2-kod ska ligga i Linuxmiljön, t.ex. `/home/<användarnamn>/ros2_ws`, **inte** i Windows Dokument-mapp.
 
@@ -76,6 +78,8 @@ När det kommandot körts utan fel är du **klar för labb 1**.
 
 ## Labbar
 
+### Del 1 — Simulering (turtlesim)
+
 | Nr | Titel | Innehåll |
 |---|---|---|
 | [Labb 1](labs/labb-1-turtlesim.md) | Visa sköldpaddan | Starta turtlesim, styra med tangentbordet, förstå noder |
@@ -86,6 +90,15 @@ När det kommandot körts utan fel är du **klar för labb 1**.
 | [Labb 6](labs/labb-6-subscriber.md) | Subscriber-nod i Python | Läsa `/turtle1/pose`, reagera på data |
 | [Labb 7](labs/labb-7-vagg-undvikare.md) | Autonom vägg-undvikare | Kombinera publisher och subscriber till ett beteende |
 | [Labb 8](labs/labb-8-slutprojekt.md) | Slutprojekt: autonom sköldpadda | Eget projekt som lämnas in |
+
+### Del 2 — Riktig bil (ESP8266)
+
+Kräver en fungerande robotbil från Driverbot-projektet. ROS2 körs fortfarande på datorn; bilen kopplas in via MQTT. Bakgrund och motivering till upplägget finns i [Från turtlesim till riktig bil](fran-turtlesim-till-riktig-bil.md).
+
+| Nr | Titel | Innehåll |
+|---|---|---|
+| [Labb 9](labs/labb-9-koppla-bilen.md) | Koppla ROS2 till din riktiga bil | Firmware-protokoll, bryggnod ROS2 ↔ MQTT, teleop, `Range`-sensor |
+| [Labb 10](labs/labb-10-autonom-bil.md) | Autonom bil | Hinderstopp, hinder-undvikare, sensorfilter, parametrar, launch-fil |
 
 ## Inlämning
 
@@ -103,3 +116,9 @@ Varje labb har en kort inlämning i slutet (svar på frågor, kodfil, eller skä
 - **Installation:** [Installera ROS2 Humble på Ubuntu (Debian-paket)](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html)
 - [Officiell ROS2-dokumentation (Jazzy)](https://docs.ros.org/en/jazzy/)
 - [ROS2 turtlesim-tutorial](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Introducing-Turtlesim/Introducing-Turtlesim.html)
+- **Riktig bil (labb 9–10):**
+  - [Från turtlesim till riktig bil](fran-turtlesim-till-riktig-bil.md) — varför MQTT-brygga och inte Raspberry Pi
+  - [EspMQTTClient (Arduino-bibliotek)](https://github.com/plapointe6/EspMQTTClient)
+  - [paho-mqtt (Python)](https://pypi.org/project/paho-mqtt/)
+  - [sensor_msgs/Range](https://docs.ros2.org/latest/api/sensor_msgs/msg/Range.html)
+  - [teleop_twist_keyboard](https://github.com/ros2/teleop_twist_keyboard)

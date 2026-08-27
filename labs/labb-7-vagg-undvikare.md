@@ -151,7 +151,7 @@ Trots vägg-undvikaren kan sköldpaddan ibland fastna i ett hörn. Lägg till lo
 2. `vagg_undvikare.py` med smart vändning (uppgift 2).
 3. Skärmdump av pennspåret (uppgift 3).
 4. Antingen uppgift 4 eller 5 + skärmdump.
-5. En kort reflektion (5–10 meningar): vad var svårast? Var det något du fick lösa på ett annat sätt än du först tänkt? Vad skulle behövas för att samma nod skulle fungera på en riktig robot?
+5. En kort reflektion (5–10 meningar): vad var svårast? Var det något du fick lösa på ett annat sätt än du först tänkt? Vad skulle behövas för att samma nod skulle fungera på en riktig robot? (Spara svaret — i labb 9–10 gör vi precis det med din Driverbot-bil.)
 
 ## Tips för felsökning
 

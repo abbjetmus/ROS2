@@ -141,3 +141,7 @@ Vilka kommandon behövs för att bygga och starta systemet (t.ex. `colcon build`
 ## Lycka till!
 
 Du har redan byggt: en publisher, en subscriber, en tillståndsmaskin, och du har använt services och parametrar. Slutprojektet handlar om att sätta ihop bitarna till något du själv har designat. Var ambitiös — men välj något du hinner bli klar med.
+
+## Nästa steg
+
+Slutprojektet avslutar simuleringsdelen. I [labb 9](labb-9-koppla-bilen.md) kopplar du ROS2 till din riktiga robotbil från Driverbot-projektet, och i [labb 10](labb-10-autonom-bil.md) flyttar du vägg-undvikaren från labb 7 över till den. Den kod du skrivit här fungerar med små ändringar även där.
