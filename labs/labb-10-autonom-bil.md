@@ -6,7 +6,9 @@
 
 ## Syfte
 
-I labb 7 byggde du en tillståndsmaskin som fick sköldpaddan att köra runt utan att fastna. Nu ska samma idé få din riktiga bil att köra runt i klassrummet utan att krocka. Koden blir förvånansvärt lik — men verkligheten är inte turtlesim, och de skillnaderna är den egentliga lärdomen i den här labben.
+I labb 7 byggde du en tillståndsmaskin som fick sköldpaddan att köra runt utan att fastna. Nu ska samma idé få din riktiga bil att köra runt utan att krocka. Koden blir förvånansvärt lik — men verkligheten är inte turtlesim, och de skillnaderna är den egentliga lärdomen i den här labben.
+
+Målet är konkret: **bilen ska på egen hand täcka en yta på 2 × 2 m.** Med en whiteboardpenna tejpad under bilen ska det finnas pennspår överallt när den är klar — precis som sköldpaddans pennspår på skärmen, fast på golvet.
 
 ## Mål
 
@@ -16,6 +18,7 @@ Efter labben ska du kunna:
 - Hantera **brusig sensordata** (filtrering).
 - Designa en tillståndsmaskin för en robot som **inte kan svänga på stället**.
 - Göra beteendet inställbart med **parametrar** och starta hela systemet med en **launch-fil**.
+- Mäta hur stor del av en yta roboten täckt och använda måttet för att jämföra inställningar.
 
 ## Bakgrund: vad är annorlunda mot turtlesim?
 
@@ -159,11 +162,36 @@ Jämför med `vagg_undvikare.py` från labb 7: samma struktur (callback byter ti
 
 Registrera, bygg, kör. Bilen ska köra runt i rummet, backa och svänga vid hinder.
 
+## Del 3: Arena, penna och täckningsmått
+
+Det som i turtlesim är pennspåret och arenan bygger du nu på golvet.
+
+| Del | Så gör du |
+|---|---|
+| **Arena** | 2 × 2 m papper på golvet (byggpapp på rulle eller hopptejpade ark). Kartongväggar runt om, minst 15 cm höga så att ultraljudet ser dem. |
+| **Rutnät** | Rita ett rutnät med 25 cm rutor = 8 × 8 = **64 rutor**. |
+| **Penna** | Whiteboard- eller tuschpenna tejpad under bilens mitt, spetsen mot golvet med lite fjädring (en bit skumgummi räcker). |
+| **Start** | Bilen står i ett hörn, riktad in mot arenan. |
+
+**Mätprotokoll** (samma varje gång, annars går resultaten inte att jämföra):
+
+1. Starta bryggan och noden. Ta tid från det att bilen börjar röra sig.
+2. Kör tills **alla rutor har pennspår** eller tills **3 minuter** gått — det som kommer först.
+3. Räkna rutor med spår. Täckning = rutor med spår / 64.
+4. Anteckna även antal krockar (bilen nuddar väggen) och antal gånger den stått still mer än 5 sekunder.
+
+| Körning | Inställningar | Tid | Täckning | Krockar | Fast |
+|---|---|---|---|---|---|
+| 1 | STOPP 0.30, BACKA 1.5, FART 0.4 | | | | |
+| 2 | | | | | |
+
+Byt papper (eller rita på baksidan) mellan körningarna. Fotografera pennspåret efter varje körning — det är din motsvarighet till skärmdumpen av turtlesim.
+
 ## Uppgifter
 
 ### Uppgift 1 — Trimma
 
-Testa `STOPP_AVSTAND` = 0.15, 0.30 och 0.60 samt `BACKA_TID` = 0.5, 1.5 och 3.0. Fyll i en tabell: krockar bilen? Fastnar den? Kommer den loss ur ett hörn? Vilka värden fungerar bäst hos dig, och hur beror de på bilens fart?
+Testa `STOPP_AVSTAND` = 0.15, 0.30 och 0.60 samt `BACKA_TID` = 0.5, 1.5 och 3.0 enligt mätprotokollet i del 3 — **ändra en sak i taget**. Fyll i tabellen: tid, täckning, krockar, fast. Vilka värden ger högst täckning på kortast tid hos dig, och hur beror de på bilens fart?
 
 ### Uppgift 2 — Filtrera sensorn
 
@@ -213,17 +241,20 @@ ros2 launch min_turtle bil.launch.py
 
 **c) Fastnat-detektor.** Om avståndet inte ändrats på 3 sekunder trots att bilen "kör framåt" — bilen sitter fast (t.ex. mot något sensorn inte ser). Backa längre än vanligt. Jämför labb 7, uppgift 5.
 
-**d) Fjärrstyrning + autonomi.** Skriv en `vaktmastare`-nod som lyssnar på **både** `/cmd_vel_teleop` (från teleop, byt topic med `--ros-args -r cmd_vel:=cmd_vel_teleop`) och `/ultraljud`, och som släpper igenom teleop-kommandon till `/cmd_vel` **utom** framåt-kommandon när det är hinder inom `STOPP_AVSTAND`. En förare som inte kan köra in i väggen.
+**d) Mönster istället för slump.** Byt ut `KOR_FRAMAT` mot en **spiral** (`angular.z` som långsamt minskar med tiden, jämför labb 5 uppgift 2) eller, om du har ett gyro (MPU6050), **banor** med riktiga 90°-svängar. Mät täckningen efter 2 minuter med samma protokoll och jämför med slumpvarianten. Vilken täcker mest per minut?
+
+**e) Fjärrstyrning + autonomi.** Skriv en `vaktmastare`-nod som lyssnar på **både** `/cmd_vel_teleop` (från teleop, byt topic med `--ros-args -r cmd_vel:=cmd_vel_teleop`) och `/ultraljud`, och som släpper igenom teleop-kommandon till `/cmd_vel` **utom** framåt-kommandon när det är hinder inom `STOPP_AVSTAND`. En förare som inte kan köra in i väggen.
 
 ## Inlämning
 
-1. Tabellen från uppgift 1.
+1. Tabellen från uppgift 1 + foto på pennspåret från din bästa körning, bredvid en skärmdump av turtlesim-spåret från labb 7 eller 8.
 2. `hinder_undvikare.py` med medianfilter och parametrar (uppgift 2–3) + skärmdumpen från uppgift 2.
 3. `bil.launch.py`.
 4. En av utmaningarna i uppgift 5.
-5. Visa bilen köra autonomt i minst 60 sekunder för någon av lärarna.
+5. Visa bilen täcka arenan autonomt för någon av lärarna.
 6. **Reflektion** (10–15 meningar), som ska svara på:
    - Vad var skillnaden mellan att skriva noden för turtlesim och för bilen? Vilka delar av labb 7-koden kunde du behålla rakt av?
+   - Hur lång tid tog det att täcka 2 × 2 m? Hur lång tid skulle ett klassrum ta med samma robot — och är det rimligt?
    - Vilket problem i verkligheten hade du inte förutsett?
    - Vilken **en** ytterligare sensor skulle förbättra bilen mest, och hur skulle du koppla in den i ROS2 (vilket topic, vilken meddelandetyp)?
 

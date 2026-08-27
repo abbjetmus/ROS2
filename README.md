@@ -98,7 +98,7 @@ Kräver en fungerande robotbil från Driverbot-projektet. ROS2 körs fortfarande
 | Nr | Titel | Innehåll |
 |---|---|---|
 | [Labb 9](labs/labb-9-koppla-bilen.md) | Koppla ROS2 till din riktiga bil | Firmware-protokoll, bryggnod ROS2 ↔ MQTT, teleop, `Range`-sensor |
-| [Labb 10](labs/labb-10-autonom-bil.md) | Autonom bil | Hinderstopp, hinder-undvikare, sensorfilter, parametrar, launch-fil |
+| [Labb 10](labs/labb-10-autonom-bil.md) | Autonom bil | Hinderstopp, hinder-undvikare, täcka 2 × 2 m med pennspår, parametrar, launch-fil |
 
 ## Inlämning
 
