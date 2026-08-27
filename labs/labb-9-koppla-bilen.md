@@ -397,9 +397,16 @@ Hitta det lägsta `hastighet`-värdet som får bilen att rulla på golvet (prova
 
 Skriv `avstand_logg.py`: en subscriber på `/ultraljud` som loggar avståndet i **cm** var tionde meddelande (jämför labb 6, uppgift 1). Kör den samtidigt som bryggan och `ros2 node info /bil_brygga`. Skärmdump som visar bryggans publishers och subscribers.
 
-### Uppgift 5 — En sensor till (utmaning)
+### Uppgift 5 — Ljussensorn (utmaning, behövs i labb 10)
 
-Lägg till WiFi-signalstyrkan som ett andra sensorvärde: firmware publicerar `WiFi.RSSI()` på `<namn>/rssi` varje sekund, och bryggan publicerar det som `std_msgs/msg/Int32` på `/wifi_signal`. Kör bilen bort från routern och se värdet sjunka med `ros2 topic echo`.
+Koppla en **ljussensor** (LDR + 10 kΩ som spänningsdelare) till `A0`, riktad **nedåt mot golvet**, gärna med en vit LED bredvid som lyser på papperet. Lägg till i firmware:
+
+```cpp
+// i loop(), i samma block som avståndet:
+client.publish(String(MQTT_NAMN) + "/ljus", String(analogRead(A0)));   // 0-1023
+```
+
+Bryggan prenumererar på `<namn>/ljus` och publicerar värdet som `std_msgs/msg/Int32` på `/ljus` (samma mönster som `fran_bilen`, men utan omräkning). Håll ett vitt och ett svart papper under sensorn och se skillnaden med `ros2 topic echo /ljus` — skriv upp de två värdena, du behöver tröskeln i labb 10.
 
 ## Inlämning
 
