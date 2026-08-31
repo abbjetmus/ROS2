@@ -40,6 +40,34 @@ Konsekvensen för tillståndsmaskinen: `VANDA`-tillståndet från labb 7 fungera
    └──────────────┘   BACKA_TID sekunder └──────────────┘
 ```
 
+## Bakgrund: skalor — från simuleringens enheter till arenans meter
+
+Turtlesims värld är 11 × 11 *enheter*. Er arena är 2 × 2 *meter*. Det ger en längdskala:
+
+```
+k = 2,0 m / 11 enheter ≈ 0,18 m per enhet
+```
+
+| I turtlesim | × 0,18 | På arenan |
+|---|---|---|
+| Arenan 11 × 11 enheter | | 2 × 2 m |
+| `MARGINAL = 1.5` (labb 7) | 1,5 × 0,18 | ≈ 0,27 m — jämför `STOPP_AVSTAND = 0.30` nedan. De motsvarar varandra! |
+| `linear.x = 2.0` enheter/s | 2,0 × 0,18 | ≈ 0,36 m/s — farten simuleringen "menar" |
+| Svängradie `linear.x / angular.z` = 2,0/1,5 | ≈ 1,3 × 0,18 | ≈ 0,24 m |
+
+**Längder** kan alltså räknas om rakt av. **Fart och sväng** kan inte det:
+
+- Bilens `linear.x` är inte fysisk — bryggan mappar `−1…1` till PWM, och vilken fart det ger beror på batteri, växlar och underlag. Den måste **mätas**.
+- Turtlesim svänger på stället (`angular.z` är en äkta girhastighet). Bilen är servostyrd: `angular.z` blir en *hjulvinkel*, och hur fort bilen faktiskt svänger beror på farten (girhastighet ≈ fart/hjulbas × tan(hjulvinkel)). Därför finns tillståndet `BACKA_SVANG` istället för `VANDA`.
+
+### Kalibrera din bil (görs en gång, med teleop från labb 9)
+
+1. **Fart:** kör `linear.x = 0.5` längs en tumstock. Ta tid över 2 m. Exempel: 2 m på 4 s → 0,5 m/s vid halvfart. Välj sedan `FART` så att bilen håller ungefär **0,36 m/s** — då rör den sig genom sin arena i samma relativa tempo som sköldpaddan genom sin, och tidskonstanter som `BACKA_TID` beter sig som i simuleringen.
+2. **Svängradie:** fullt utslag, konstant låg fart, kör ett varv runt en krita och mät diametern. Typisk bil hamnar på 0,3–0,5 m i radie — sämre än simuleringens 0,24 m. Skriv upp värdet; det förklarar varför bilen behöver mer plats i hörnen.
+3. **Bromssträcka:** vid 0,4 m/s och ~200 ms latens hinner bilen ca 8 cm *innan* ett stoppkommando ens verkar, plus rullsträckan. Det är därför `STOPP_AVSTAND` inte kan vara hur litet som helst.
+
+**Tumregeln i koden:** räkna inte om konstanter i dina noder — arbeta i SI-enheter direkt. `/ultraljud` är redan i meter, så `STOPP_AVSTAND = 0.30` *är* 30 cm. Skalfaktorn använder du åt andra hållet: när du testar städlogiken i turtlesim först, sätt sköldpaddans fart till *din uppmätta bilfart / 0,18* — då blir jämförelsen mellan pennspåren ärlig.
+
 ## Del 1: Säkerhet först — hinderstopp
 
 Innan bilen får köra själv ska den kunna **stanna** själv. Skapa `src/min_turtle/min_turtle/hinder_stopp.py` (jämför `stoppare.py` i labb 6):
@@ -250,11 +278,12 @@ ros2 launch min_turtle bil.launch.py
 ## Inlämning
 
 1. Tabellen från uppgift 1 + foto på pennspåret från din bästa körning, bredvid en skärmdump av turtlesim-spåret från labb 7 eller 8.
-2. `hinder_undvikare.py` med medianfilter och parametrar (uppgift 2–3) + skärmdumpen från uppgift 2.
-3. `bil.launch.py`.
-4. En av utmaningarna i uppgift 5.
-5. Visa bilen täcka arenan autonomt för någon av lärarna.
-6. **Reflektion** (10–15 meningar), som ska svara på:
+2. Dina kalibreringsvärden: uppmätt fart (m/s) vid valt `FART`, uppmätt svängradie, och beräknad bromssträcka vid din fart.
+3. `hinder_undvikare.py` med medianfilter och parametrar (uppgift 2–3) + skärmdumpen från uppgift 2.
+4. `bil.launch.py`.
+5. En av utmaningarna i uppgift 5.
+6. Visa bilen täcka arenan autonomt för någon av lärarna.
+7. **Reflektion** (10–15 meningar), som ska svara på:
    - Vad var skillnaden mellan att skriva noden för turtlesim och för bilen? Vilka delar av labb 7-koden kunde du behålla rakt av?
    - Hur lång tid tog det att täcka 2 × 2 m? Hur lång tid skulle ett klassrum ta med samma robot — och är det rimligt?
    - Vilket problem i verkligheten hade du inte förutsett?

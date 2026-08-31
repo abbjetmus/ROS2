@@ -221,4 +221,5 @@ ESP8266 är också 3,3 V, så sensorer som eleverna redan har fungerande på ESP
 - Lägg till en **ROS2 ↔ MQTT-brygga** (en Python-nod med `paho-mqtt`).
 - Två små **firmware-ändringar**: ett kommando-topic med `hastighet,vinkel`, och avståndet publicerat som siffra. Plus dödmansgrepp.
 - **Labb 9–10** är en naturlig fortsättning på labb 7: samma vägg-undvikare, fast på riktig hårdvara.
+- **Skalan mellan världarna:** turtlesims 11 enheter ↔ arenans 2 m, dvs. ≈ 0,18 m/enhet. Längder räknas om rakt av; bilens fart och svängradie måste mätas — kalibreringsuppgifterna står i labb 10.
 - Raspberry Pi tillför inget för den här kursen och skapar nya nätverks- och elektronikproblem. Vill ni senare ha "riktig" ROS2 på bilen är **ESP32 + micro-ROS** ett billigare och enklare steg än Pi.
