@@ -16,19 +16,13 @@ Eftersom bilarna **redan pratar MQTT** saknas bara en liten ROS2-nod som övers�
 
 ---
 
-## Alternativen
+## Lösningen: en brygga
 
-| | **A. ROS2 ↔ MQTT-brygga** (rekommenderas) | **B. micro-ROS på ESP32** |
-|---|---|---|
-| Ny hårdvara | Ingen | ESP32 (~50–80 kr). ESP8266 stöds **inte** av micro-ROS |
-| Var kör ROS2 | På datorn (WSL2) | På datorn + "mikro-noder" på ESP32 |
-| Nätverk från WSL2 | Enkelt — bara utgående TCP till molnbrokern | micro-ROS-agent på datorn; ESP32 måste nå in i WSL2 → krångligt NAT |
-| Passar kursen | Ja — bygger direkt på labb 5–7 | Bra som fördjupning |
-
+All ROS2-kod körs på elevens dator i WSL2, precis som i labbarna. Det enda som tillkommer är en **bryggnod** som översätter mellan ROS2-topics och MQTT-topics — ingen ny hårdvara, och nätverket är enkelt eftersom både datorn och bilen bara gör utgående anslutningar till molnbrokern.
 
 ---
 
-## Så här fungerar alternativ A i praktiken
+## Så här fungerar bryggan i praktiken
 
 ### Arkitektur
 
