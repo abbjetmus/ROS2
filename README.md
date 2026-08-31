@@ -117,7 +117,7 @@ Varje labb har en kort inlämning i slutet (svar på frågor, kodfil, eller skä
 - [Officiell ROS2-dokumentation (Jazzy)](https://docs.ros.org/en/jazzy/)
 - [ROS2 turtlesim-tutorial](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Introducing-Turtlesim/Introducing-Turtlesim.html)
 - **Riktig bil (labb 9–10):**
-  - [Från turtlesim till riktig bil](fran-turtlesim-till-riktig-bil.md) — varför MQTT-brygga och inte Raspberry Pi
+  - [Från turtlesim till riktig bil](fran-turtlesim-till-riktig-bil.md) — bakgrund och motivering till MQTT-bryggan
   - [EspMQTTClient (Arduino-bibliotek)](https://github.com/plapointe6/EspMQTTClient)
   - [paho-mqtt (Python)](https://pypi.org/project/paho-mqtt/)
   - [sensor_msgs/Range](https://docs.ros2.org/latest/api/sensor_msgs/msg/Range.html)

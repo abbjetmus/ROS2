@@ -4,17 +4,13 @@ Eleverna har byggt en robotbil med **ESP8266**, en TT-motor (PWM + riktningspinn
 
 > **Labbarna finns nu:** upplägget nedan är genomfört som [labb 9 — Koppla ROS2 till din riktiga bil](labs/labb-9-koppla-bilen.md) och [labb 10 — Autonom bil](labs/labb-10-autonom-bil.md). Det här dokumentet är bakgrunden och motiveringen.
 
-Det här dokumentet svarar på tre frågor:
-
-1. Hur kan ett ROS2-program (t.ex. vägg-undvikaren från labb 7) styra den fysiska bilen och läsa dess sensorer?
-2. Måste bilen byggas om med en Raspberry Pi?
-3. Fungerar sensorer som är gjorda för Arduino även på Raspberry Pi?
+Det här dokumentet svarar på frågan: **hur kan ett ROS2-program (t.ex. vägg-undvikaren från labb 7) styra den fysiska bilen och läsa dess sensorer?**
 
 ---
 
 ## Kort svar
 
-**Nej, de behöver inte byta till Raspberry Pi.** ROS2 kan inte köras *på* en ESP8266, men det behöver den inte heller. ROS2 körs på elevens dator (WSL2) precis som idag, och bilen blir en "drivrutin" som ROS2 pratar med över WiFi. Så är riktiga robotar oftast byggda: ROS på en dator, en mikrokontroller som sköter motorer och sensorer.
+**Bilen behöver inte byggas om.** ROS2 kan inte köras *på* en ESP8266, men det behöver den inte heller. ROS2 körs på elevens dator (WSL2) precis som idag, och bilen blir en "drivrutin" som ROS2 pratar med över WiFi. Så är riktiga robotar oftast byggda: ROS på en dator, en mikrokontroller som sköter motorer och sensorer.
 
 Eftersom bilarna **redan pratar MQTT** saknas bara en liten ROS2-nod som översätter mellan ROS2-topics och MQTT-topics. Då fungerar labb 7-koden nästan oförändrad mot den fysiska bilen.
 
@@ -22,14 +18,13 @@ Eftersom bilarna **redan pratar MQTT** saknas bara en liten ROS2-nod som övers�
 
 ## Alternativen
 
-| | **A. ROS2 ↔ MQTT-brygga** (rekommenderas) | **B. micro-ROS på ESP32** | **C. Raspberry Pi på bilen** |
-|---|---|---|---|
-| Ny hårdvara | Ingen | ESP32 (~50–80 kr). ESP8266 stöds **inte** av micro-ROS | Pi 4/5 + strömförsörjning 5 V/3 A + ändå en motordrivare |
-| Var kör ROS2 | På datorn (WSL2) | På datorn + "mikro-noder" på ESP32 | På Pi:n (Ubuntu 24.04) |
-| Nätverk från WSL2 | Enkelt — bara utgående TCP till molnbrokern | micro-ROS-agent på datorn; ESP32 måste nå in i WSL2 → krångligt NAT | ROS2 DDS-discovery mellan WSL2 och Pi över LAN fungerar dåligt utan *mirrored networking* eller discovery server |
-| Passar kursen | Ja — bygger direkt på labb 5–7 | Bra som fördjupning | Överkurs; mest tid går åt till Linux och nätverk |
+| | **A. ROS2 ↔ MQTT-brygga** (rekommenderas) | **B. micro-ROS på ESP32** |
+|---|---|---|
+| Ny hårdvara | Ingen | ESP32 (~50–80 kr). ESP8266 stöds **inte** av micro-ROS |
+| Var kör ROS2 | På datorn (WSL2) | På datorn + "mikro-noder" på ESP32 |
+| Nätverk från WSL2 | Enkelt — bara utgående TCP till molnbrokern | micro-ROS-agent på datorn; ESP32 måste nå in i WSL2 → krångligt NAT |
+| Passar kursen | Ja — bygger direkt på labb 5–7 | Bra som fördjupning |
 
-Alternativ C är dessutom lite missvisande: även med en Raspberry Pi brukar man behålla en mikrokontroller för motorer och sensorer, eftersom Pi:n har svag PWM och saknar analoga ingångar (se sensoravsnittet längst ner).
 
 ---
 
@@ -200,21 +195,6 @@ Dessutom bör hastigheterna skalas ner (`linear.x = 0.5` istället för `2.0`, `
 
 ---
 
-## Fungerar Arduino-sensorer på Raspberry Pi?
-
-Delvis. Det avgörs av sensortyp och spänning, inte av märket "Arduino":
-
-| Sensortyp | På Raspberry Pi | Kommentar |
-|---|---|---|
-| I2C / SPI (MPU6050, VL53L0X, BME280, OLED) | ✅ | Fungerar utmärkt, ofta bättre än på Arduino |
-| Digitala (HC-SR04, knappar, DHT11, IR-hinderdetektor) | ⚠️ | Fungerar, men Pi:n tål bara 3,3 V på ingångarna — HC-SR04:s echo på 5 V kräver spänningsdelare. Tidsmätning i Python är också sämre än `pulseIn()` |
-| Analoga (LDR, potentiometer, analog linjeföljare, MQ-gassensorer) | ❌ | Pi **saknar ADC** helt — kräver extern krets, t.ex. MCP3008 eller ADS1115 |
-| Servo / PWM-motorer | ⚠️ | Bara 2 hårdvaru-PWM-kanaler; mjukvaru-PWM ryckar. Löses vanligen med ett PCA9685-kort |
-
-ESP8266 är också 3,3 V, så sensorer som eleverna redan har fungerande på ESP:n är redan 3,3 V-kompatibla. Det som verkligen saknas på Pi:n är analoga ingångar och bra PWM — och det är precis därför man brukar behålla en mikrokontroller bredvid Pi:n även i "Raspberry Pi-robotar".
-
----
-
 ## Sammanfattning
 
 - Behåll ESP8266-bilarna. ROS2 körs på datorn, bilen är en drivrutin.
@@ -222,4 +202,3 @@ ESP8266 är också 3,3 V, så sensorer som eleverna redan har fungerande på ESP
 - Två små **firmware-ändringar**: ett kommando-topic med `hastighet,vinkel`, och avståndet publicerat som siffra. Plus dödmansgrepp.
 - **Labb 9–10** är en naturlig fortsättning på labb 7: samma vägg-undvikare, fast på riktig hårdvara.
 - **Skalan mellan världarna:** turtlesims 11 enheter ↔ arenans 2 m, dvs. ≈ 0,18 m/enhet. Längder räknas om rakt av; bilens fart och svängradie måste mätas — kalibreringsuppgifterna står i labb 10.
-- Raspberry Pi tillför inget för den här kursen och skapar nya nätverks- och elektronikproblem. Vill ni senare ha "riktig" ROS2 på bilen är **ESP32 + micro-ROS** ett billigare och enklare steg än Pi.
