@@ -80,6 +80,8 @@ När det kommandot körts utan fel är du **klar för labb 1**.
 
 ### Del 1 — Simulering (turtlesim)
 
+Labbarna bygger stegvis upp de program som i del 2 styr din Driverbot-bil. Allt du skriver här — publishers, subscribers, tillståndsmaskiner, launch-filer — återanvänds på den riktiga bilen.
+
 | Nr | Titel | Innehåll |
 |---|---|---|
 | [Labb 1](labs/labb-1-turtlesim.md) | Visa sköldpaddan | Starta turtlesim, styra med tangentbordet, förstå noder |
@@ -89,11 +91,13 @@ När det kommandot körts utan fel är du **klar för labb 1**.
 | [Labb 5](labs/labb-5-publisher.md) | Publisher-nod i Python | Skriva en egen nod som styr sköldpaddan |
 | [Labb 6](labs/labb-6-subscriber.md) | Subscriber-nod i Python | Läsa `/turtle1/pose`, reagera på data |
 | [Labb 7](labs/labb-7-vagg-undvikare.md) | Autonom vägg-undvikare | Kombinera publisher och subscriber till ett beteende |
-| [Labb 8](labs/labb-8-slutprojekt.md) | Slutprojekt: autonom sköldpadda | Eget projekt som lämnas in |
+| [Labb 8](labs/labb-8-robotmopp-simulering.md) | Robotmoppen i simulering | Täckningsmätare, manuell och autonom städning, launch-fil — hela städprogrammet testklart |
 
 ### Del 2 — Riktig bil (ESP8266)
 
 Kräver en fungerande robotbil från Driverbot-projektet. ROS2 körs fortfarande på datorn; bilen kopplas in via MQTT. Bakgrund och motivering till upplägget finns i [Från turtlesim till riktig bil](fran-turtlesim-till-riktig-bil.md).
+
+Projektmålet är en **robotmopp** som täcker en 2 × 2 m-arena med pennspår. **Nivå 1:** styr bilen manuellt från ROS2 (teleop) och berör alla rutor med pennan. **Nivå 2–3:** bilen täcker ytan autonomt (slumpstädning respektive smartare strategi). Se presentationen [Driverbot250s-ROS2.pptx](Driverbot250s-ROS2.pptx).
 
 | Nr | Titel | Innehåll |
 |---|---|---|

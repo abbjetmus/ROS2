@@ -415,7 +415,7 @@ Bryggan prenumererar på `<namn>/ljus` och publicerar värdet som `std_msgs/msg/
 3. Svar på uppgift 1 och 2.
 4. Bryggan med dödzon (uppgift 3) + värdet du hittade.
 5. `avstand_logg.py` + skärmdump från uppgift 4.
-6. Visa bilen köra via teleop för någon av lärarna.
+6. Visa bilen köra via teleop för någon av lärarna. Teleop-körningen är grunden för **nivå 1** i projektet: i labb 10 använder du den för att manuellt täcka alla rutor i arenan med pennan.
 
 ## Vanliga problem
 

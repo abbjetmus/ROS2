@@ -8,7 +8,11 @@
 
 I labb 7 byggde du en tillståndsmaskin som fick sköldpaddan att köra runt utan att fastna. Nu ska samma idé få din riktiga bil att köra runt utan att krocka. Koden blir förvånansvärt lik — men verkligheten är inte turtlesim, och de skillnaderna är den egentliga lärdomen i den här labben.
 
-Målet är konkret: **bilen ska på egen hand täcka en yta på 2 × 2 m.** Med en whiteboardpenna tejpad under bilen ska det finnas pennspår överallt när den är klar — precis som sköldpaddans pennspår på skärmen, fast på golvet.
+Målet är konkret: **bilen ska täcka en yta på 2 × 2 m.** Med en whiteboardpenna tejpad under bilen ska det finnas pennspår i alla rutor när den är klar — precis som sköldpaddans pennspår i labb 8, fast på golvet. Nivåerna avgör *hur*:
+
+- **Nivå 1:** du styr bilen **manuellt** med teleop (labb 9) och berör alla rutor med pennan (del 3 nedan).
+- **Nivå 2:** bilen täcker ytan **autonomt** med slumpstädning (del 1–2 + uppgifterna).
+- **Nivå 3:** en smartare strategi som mätbart slår slumpen (uppgift 5 d–e).
 
 ## Mål
 
@@ -201,15 +205,18 @@ Det som i turtlesim är pennspåret och arenan bygger du nu på golvet.
 | **Penna** | Whiteboard- eller tuschpenna tejpad under bilens mitt, spetsen mot golvet med lite fjädring (en bit skumgummi räcker). |
 | **Start** | Var som helst i arenan, valfri riktning. |
 
+**Nivå 1 — manuell städning.** Första körningen på arenan gör du själv: starta bryggan och teleop (labb 9), och kör tills **alla 64 rutor har pennspår**. Ta tiden. Det är samma sak som labb 8 del 2, fast på riktigt — och det är kravet för nivå 1. Din tid blir dessutom måttstocken som de autonoma körningarna ska jämföras mot.
+
 **Mätprotokoll** (samma varje gång, annars går resultaten inte att jämföra):
 
-1. Starta bryggan och noden. Ta tid från det att bilen börjar röra sig.
+1. Starta bryggan och noden (eller teleop för den manuella körningen). Ta tid från det att bilen börjar röra sig.
 2. Kör tills **alla rutor har pennspår** eller tills **3 minuter** gått — det som kommer först.
 3. Räkna rutor med spår. Täckning = rutor med spår / 64.
 4. Anteckna även antal krockar (bilen nuddar väggen) och antal gånger den stått still mer än 5 sekunder.
 
 | Körning | Inställningar | Tid | Täckning | Krockar | Fast |
 |---|---|---|---|---|---|
+| 0 | Manuell (teleop) — nivå 1 | | | | |
 | 1 | STOPP 0.30, BACKA 1.5, FART 0.4 | | | | |
 | 2 | | | | | |
 
@@ -277,13 +284,16 @@ ros2 launch min_turtle bil.launch.py
 
 ## Inlämning
 
-1. Tabellen från uppgift 1 + foto på pennspåret från din bästa körning, bredvid en skärmdump av turtlesim-spåret från labb 7 eller 8.
-2. Dina kalibreringsvärden: uppmätt fart (m/s) vid valt `FART`, uppmätt svängradie, och beräknad bromssträcka vid din fart.
-3. `hinder_undvikare.py` med medianfilter och parametrar (uppgift 2–3) + skärmdumpen från uppgift 2.
-4. `bil.launch.py`.
-5. En av utmaningarna i uppgift 5.
-6. Visa bilen täcka arenan autonomt för någon av lärarna.
-7. **Reflektion** (10–15 meningar), som ska svara på:
+För **nivå 1** räcker punkt 1 (med labb 9 klar). Punkt 2–8 hör till nivå 2 och 3.
+
+1. Foto på pennspåret från din **manuella nivå 1-körning** (alla rutor + tid), bredvid skärmdumpen av det manuella turtlesim-spåret från labb 8.
+2. Tabellen från uppgift 1 + foto på pennspåret från din bästa autonoma körning, bredvid en skärmdump av turtlesim-spåret från labb 8.
+3. Dina kalibreringsvärden: uppmätt fart (m/s) vid valt `FART`, uppmätt svängradie, och beräknad bromssträcka vid din fart.
+4. `hinder_undvikare.py` med medianfilter och parametrar (uppgift 2–3) + skärmdumpen från uppgift 2.
+5. `bil.launch.py`.
+6. En av utmaningarna i uppgift 5.
+7. Visa för någon av lärarna: **nivå 1** — du täcker alla rutor med teleop; **nivå 2–3** — bilen täcker arenan autonomt.
+8. **Reflektion** (10–15 meningar), som ska svara på:
    - Vad var skillnaden mellan att skriva noden för turtlesim och för bilen? Vilka delar av labb 7-koden kunde du behålla rakt av?
    - Hur lång tid tog det att täcka 2 × 2 m? Hur lång tid skulle ett klassrum ta med samma robot — och är det rimligt?
    - Vilket problem i verkligheten hade du inte förutsett?
